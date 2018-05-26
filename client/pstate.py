@@ -5,7 +5,8 @@ class PState:
       'messageReady': 'Pending',
     },
     'Recording': {
-      'up': 'Uploading',
+      #'up': 'Uploading',
+      'done': 'Uploading',
     },
     'Uploading': {
       'done': 'Standby',
@@ -28,8 +29,12 @@ class PState:
   def follow_edge(self, action):
     try:
       self.state = self.STATE_GRAPH[self.state][action]
+      print(' [STATE] switching to state {}'.format(self.state))
+      self.state_callbacks.get(self.state, lambda: None)()
     except Exception:
-      print(' [ERROR] {} is not a valid action for state {}'.format(action, self.state))
-
-    
-    self.state_callbacks.get(self.state, lambda: None)()
+      if (action == 'error'):
+        self.state = 'Standby'
+        print(' [STATE] switching to state {}'.format(self.state))
+        self.state_callbacks.get(self.state, lambda: None)()
+      else:
+        print(' [INFO] {} is not a valid action for state {}'.format(action, self.state))
