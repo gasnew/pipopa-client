@@ -4,6 +4,7 @@ import pyaudio
 import wave
 import sys
 import requests
+import os
 
 def normalize(snd_data):
   "Average the volume out"
@@ -91,13 +92,16 @@ def playback():
   # close PyAudio (5)
   p.terminate()
 
-def upload(url, credentials, recipient):
-  # Log in
-  s = requests.session()
-  r1 = s.post('{}/login'.format(url), credentials)
-  print(r1.status_code)
-  print(r1.text)
+def login(s, url, credentials):
+  r = s.post('{}/login'.format(url), credentials)
+  print(r.status_code)
   print('Logged in!')
+
+def upload(url, credentials, recipient):
+  s = requests.session()
+
+  # Log in
+  login(s, url, credentials)
 
   # Create message
   message = {
@@ -116,18 +120,33 @@ def upload(url, credentials, recipient):
   print(r3.status_code)
   print('POSTED!!!')
 
-def download():
-  # Log in
+def download(url, credentials, mids):
   s = requests.session()
-  url = 'http://192.168.0.146:8080'
-  credentials = {
-    'username': 'jesse',
-    'password': 'jesse',
-  }
-  r1 = s.post('{}/login'.format(url), credentials)
-  print(r1.status_code)
-  print(r1.text)
-  print('Logged in!')
+
+  # Log in
+  login(s, url, credentials)
+
+  # download those files
+  path = '{}/../messages'.format(os.path.dirname(os.path.abspath(__file__)))
+  for mid in mids:
+    print('message {}'.format(mid))
+
+    filename = '{}/{}.wav'.format(path, mid)
+    r3 = s.get('{}/messages/download/{}'.format(url, mid), stream=True)
+    if r3.status_code == 200:
+      with open(filename, 'wb') as f:
+        for chunk in r3.iter_content(chunk_size=512): 
+          if chunk: # filter out keep-alive new chunks
+            f.write(chunk)
+    print(r3.status_code)
+
+  print('FILES DOWNLOADED!!')
+
+def poll(url, credentials):
+  s = requests.session()
+
+  # Log in
+  login(s, url, credentials)
 
   # retrieve waiting messages
   r2 = s.get('{}/messages/waiting'.format(url))
@@ -136,16 +155,4 @@ def download():
   print(r2.text)
   mids = [m['id'] for m in r2.json()['messages']]
 
-  # download those files
-  for mid in mids:
-    print('message {}'.format(mid))
-
-    filename = '{}.wav'.format(mid)
-    r3 = s.get('{}/messages/download/{}'.format(url, mid), stream=True)
-    with open(filename, 'wb') as f:
-      for chunk in r3.iter_content(chunk_size=512): 
-        if chunk: # filter out keep-alive new chunks
-          f.write(chunk)
-    print(r3.status_code)
-
-  print('FILES DOWNLOADED!!')
+  return mids

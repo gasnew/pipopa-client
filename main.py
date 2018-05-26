@@ -11,7 +11,8 @@ GPIO.setmode(GPIO.BCM) # make diagram life happy
 GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Impeccable initializations
-pipopa = PiPoPa()
+#pipopa = PiPoPa('garrett', 'garrett', 'jesse')
+pipopa = PiPoPa('jesse', 'jesse', 'jesse')
 
 # Eventful events
 GPIO.add_event_detect(BUTTON_PIN,
@@ -20,4 +21,5 @@ GPIO.add_event_detect(BUTTON_PIN,
   bouncetime=20)
 
 while True:
-  time.sleep(5)
+  pipopa.poll()
+  time.sleep(3)

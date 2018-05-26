@@ -2,7 +2,7 @@ class PState:
   STATE_GRAPH = { 
     'Standby': {
       'down': 'Recording',
-      'receiveBroadcast': 'Downloading',
+      'newMessage': 'Downloading',
     },
     'Recording': {
       #'up': 'Uploading',

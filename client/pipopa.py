@@ -2,7 +2,16 @@ from utils import *
 from pstate import PState
 
 class PiPoPa:
-  def __init__(self):
+  def __init__(self, name, password, recipient):
+    self.name = name
+    self.password = password
+    self.recipient = recipient
+
+    self.credentials = {
+      'username': self.name,
+      'password': self.password,
+    }
+    self.url = 'http://204.48.25.88:8080'
     self.p_state = PState('Standby')
 
     self.p_state.set_state_callback('Recording', self.record)
@@ -28,12 +37,7 @@ class PiPoPa:
   def upload(self):
     print(' [UPLOAD] Uploading now...')
     try:
-      url = 'http://204.48.25.88:8080'
-      credentials = {
-        'username': 'garrett',
-        'password': 'garrett',
-      }
-      upload(url, credentials, 'jesse')
+      upload(self.url, self.credentials, self.recipient)
       self.p_state.follow_edge('done')
     except Exception as e:
       print(' [ERROR] Upload failed with error:')
@@ -41,7 +45,7 @@ class PiPoPa:
       self.p_state.follow_edge('error')
 
   def download(self):
-    download()
+    download(self.url, self.credentials, self.new_mids)
     self.p_state.follow_edge('done')
 
   def await_feedback(self):
@@ -50,3 +54,11 @@ class PiPoPa:
   def playback(self):
     playback()
     self.p_state.follow_edge('done')
+
+  def poll(self):
+    print(' [POLL] Polling for new messages...')
+    mids = poll(self.url, self.credentials)
+    print(mids)
+    print(' [POLL] No new messages found')
+    self.new_mids = mids
+    self.p_state.follow_edge('newMessage')
