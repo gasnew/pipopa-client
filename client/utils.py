@@ -20,7 +20,7 @@ def record():
   FORMAT = pyaudio.paInt16
   CHANNELS = 1
   RATE = 44100
-  RECORD_SECONDS = 5
+  RECORD_SECONDS = 3
   WAVE_OUTPUT_FILENAME = "output.wav"
 
   if sys.platform == 'darwin':
@@ -91,14 +91,9 @@ def playback():
   # close PyAudio (5)
   p.terminate()
 
-def upload():
+def upload(url, credentials, recipient):
   # Log in
   s = requests.session()
-  url = 'http://192.168.0.146:8080'
-  credentials = {
-    'username': 'garrett',
-    'password': 'garrett',
-  }
   r1 = s.post('{}/login'.format(url), credentials)
   print(r1.status_code)
   print(r1.text)
@@ -106,7 +101,7 @@ def upload():
 
   # Create message
   message = {
-    'recipient': 'jesse',
+    'recipient': recipient,
   }
   r2 = s.post('{}/messages/new'.format(url), message)
   print('Message created?')
