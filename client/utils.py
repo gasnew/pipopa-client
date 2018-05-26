@@ -59,14 +59,12 @@ def record():
   wf.writeframes(joined_frames)
   wf.close()
 
-def playback():
+def playback(mid):
   CHUNK = 512
 
-  if len(sys.argv) < 2:
-    print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
-    sys.exit(-1)
-
-  wf = wave.open(sys.argv[1], 'rb')
+  path = '{}/../messages'.format(os.path.dirname(os.path.abspath(__file__)))
+  filename = '{}/{}.wav'.format(path, mid)
+  wf = wave.open(filename, 'rb')
 
   # instantiate PyAudio (1)
   p = pyaudio.PyAudio()
@@ -91,6 +89,11 @@ def playback():
 
   # close PyAudio (5)
   p.terminate()
+
+def delete(mid):
+  path = '{}/../messages'.format(os.path.dirname(os.path.abspath(__file__)))
+  filename = '{}/{}.wav'.format(path, mid)
+  os.unlink(filename)
 
 def login(s, url, credentials):
   r = s.post('{}/login'.format(url), credentials)
@@ -150,9 +153,17 @@ def poll(url, credentials):
 
   # retrieve waiting messages
   r2 = s.get('{}/messages/waiting'.format(url))
-  print('Messages:')
   print(r2.status_code)
-  print(r2.text)
   mids = [m['id'] for m in r2.json()['messages']]
 
   return mids
+
+def mark_read(url, credentials, mid):
+  s = requests.session()
+
+  # Log in
+  login(s, url, credentials)
+
+  # Mark message as read
+  r = s.get('{}/messages/mark-read/{}'.format(url, mid))
+  print(r.status_code)

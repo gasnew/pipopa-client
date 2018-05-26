@@ -1,8 +1,9 @@
 class PState:
   STATE_GRAPH = { 
     'Standby': {
+      'waitingMessage': 'AwaitingPlayback',
       'down': 'Recording',
-      'newMessage': 'Downloading',
+      'poll': 'Polling',
     },
     'Recording': {
       #'up': 'Uploading',
@@ -20,6 +21,10 @@ class PState:
     'Playing': {
       'done': 'Standby',
       'more': 'AwaitingPlayback',
+    },
+    'Polling': {
+      'newMessage': 'Downloading',
+      'done': 'Standby',
     },
   }
 
