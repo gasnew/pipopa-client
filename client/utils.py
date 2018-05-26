@@ -5,6 +5,9 @@ import wave
 import sys
 import requests
 import os
+from sys import byteorder
+from array import array
+from struct import pack
 
 def normalize(snd_data):
   "Average the volume out"
@@ -14,6 +17,7 @@ def normalize(snd_data):
   r = array('h')
   for i in snd_data:
     r.append(int(i*scale_factor))
+
   return r
 
 def record():
@@ -21,7 +25,7 @@ def record():
   FORMAT = pyaudio.paInt16
   CHANNELS = 1
   RATE = 44100
-  RECORD_SECONDS = 3
+  RECORD_SECONDS = 5
   WAVE_OUTPUT_FILENAME = "output.wav"
 
   if sys.platform == 'darwin':
@@ -37,11 +41,16 @@ def record():
 
   print("* recording")
 
-  frames = []
-
-  for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-    data = stream.read(CHUNK)
-    frames.append(data)
+  try:
+    data_all = array('h')
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+      # little endian, signed short
+      data_chunk = array('h', stream.read(CHUNK))
+      if byteorder == 'big':
+        data_chunk.byteswap()
+      data_all.extend(data_chunk)
+  except Exception as e:
+    print(e)
 
   print("* done recording")
 
@@ -49,14 +58,14 @@ def record():
   stream.close()
   p.terminate()
 
-  joined_frames = b''.join(frames)
-  #joined_frames = normalize(joined_frames)
+  data_all = normalize(data_all)
 
+  frames = pack('<' + ('h' * len(data_all)), *data_all)
   wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
   wf.setnchannels(CHANNELS)
   wf.setsampwidth(p.get_sample_size(FORMAT))
   wf.setframerate(RATE)
-  wf.writeframes(joined_frames)
+  wf.writeframes(frames)
   wf.close()
 
 def playback(mid):
