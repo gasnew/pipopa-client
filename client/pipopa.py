@@ -23,6 +23,14 @@ class PiPoPa:
     self.p_state.set_state_callback('Playing', self.playback)
     self.p_state.set_state_callback('Polling', self.poll)
 
+    self.led_state = {
+      'state': self.p_state.state,
+      'period_counter': 0,
+      'red': False,
+      'green': False,
+      'yellow': False,
+    }
+
   def do_thing(self, channel):
     action = 'up' if GPIO.input(channel) else 'down'
     self.p_state.follow_edge(action)
@@ -98,3 +106,7 @@ class PiPoPa:
   def filenames(self):
     (_, _, filenames) = walk('messages').next()
     return filenames
+
+  def get_led_state(self):
+    self.led_state['state'] = self.p_state.state
+    return self.led_state
