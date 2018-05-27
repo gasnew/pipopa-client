@@ -62,10 +62,15 @@ class PiPoPa:
 
   def download(self):
     print(' [DOWNLOAD] Downloading now...')
-    download(self.url, self.credentials, self.new_mids)
-    self.new_mids = []
-    print(' [DOWNLOAD] Finished downloading!')
-    self.p_state.follow_edge('done')
+    try:
+      download(self.url, self.credentials, self.new_mids)
+      self.new_mids = []
+      print(' [DOWNLOAD] Finished downloading!')
+      self.p_state.follow_edge('done')
+    except Exception as e:
+      print(' [ERROR] Upload failed with error:')
+      print(e)
+      self.p_state.follow_edge('error')
 
   def await_playback(self):
     mid = self.current_mids()[0]

@@ -25,7 +25,7 @@ def record():
   FORMAT = pyaudio.paInt16
   CHANNELS = 1
   RATE = 44100
-  RECORD_SECONDS = 7
+  RECORD_SECONDS = 5
   WAVE_OUTPUT_FILENAME = "output.wav"
 
   if sys.platform == 'darwin':
@@ -106,8 +106,6 @@ def delete(mid):
 
 def login(s, url, credentials):
   r = s.post('{}/login'.format(url), credentials)
-  print(r.status_code)
-  print('Logged in!')
 
 def upload(url, credentials, recipient):
   s = requests.session()
@@ -120,17 +118,11 @@ def upload(url, credentials, recipient):
     'recipient': recipient,
   }
   r2 = s.post('{}/messages/new'.format(url), message)
-  print('Message created?')
-  print(r2.status_code)
-  print(r2.text)
 
   # Upload audio
   mid = r2.json()['id']
   with open('output.wav', 'rb') as f:
     r3 = s.post('{}/messages/upload/{}'.format(url, mid), data=f)
-
-  print(r3.status_code)
-  print('POSTED!!!')
 
 def download(url, credentials, mids):
   s = requests.session()
@@ -150,9 +142,6 @@ def download(url, credentials, mids):
         for chunk in r3.iter_content(chunk_size=512): 
           if chunk: # filter out keep-alive new chunks
             f.write(chunk)
-    print(r3.status_code)
-
-  print('FILES DOWNLOADED!!')
 
 def poll(url, credentials):
   s = requests.session()
@@ -162,7 +151,6 @@ def poll(url, credentials):
 
   # retrieve waiting messages
   r2 = s.get('{}/messages/waiting'.format(url))
-  print(r2.status_code)
   mids = [m['id'] for m in r2.json()['messages']]
 
   return mids
@@ -175,4 +163,3 @@ def mark_read(url, credentials, mid):
 
   # Mark message as read
   r = s.get('{}/messages/mark-read/{}'.format(url, mid))
-  print(r.status_code)
