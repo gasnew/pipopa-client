@@ -26,7 +26,6 @@ STATE_MAPS = {
 }
 
 def update_leds(state, red, green, yellow):
-  print(state)
   channels = {
     'red': red,
     'green': green,
