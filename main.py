@@ -2,9 +2,6 @@
 from client import *
 
 # Cheery channels
-RED_PIN = 18
-GREEN_PIN = 15
-YELLOW_PIN = 14
 BUTTON_PIN = 23
 
 # Interesting inits
@@ -16,8 +13,9 @@ GPIO.setup(GREEN_PIN, GPIO.OUT)
 GPIO.setup(YELLOW_PIN, GPIO.OUT)
 
 # Impeccable initializations
-pipopa = PiPoPa('garrett', 'garrett', 'jesse')
-#pipopa = PiPoPa('jesse', 'jesse', 'garrett')
+#pipopa = PiPoPa('garrett', 'garrett', 'jesse')
+pipopa = PiPoPa('jesse', 'jesse', 'garrett')
+leds = LEDs(pipopa.get_led_state)
 
 # Eventful events
 GPIO.add_event_detect(BUTTON_PIN,
@@ -26,25 +24,15 @@ GPIO.add_event_detect(BUTTON_PIN,
   bouncetime=20)
 
 try:
-  POLL_PERIOD = 3
-  BLINK_PERIOD = 0.05
-  poll_timer = 0
-  while True:
-    # Luscious LEDs
-    update_leds(
-      state = pipopa.get_led_state(),
-      red = RED_PIN,
-      green = GREEN_PIN,
-      yellow = YELLOW_PIN,
-    )
+  # Luscious LEDs
+  leds.start()
 
+  POLL_PERIOD = 3
+  while True:
     # Putrid polling
-    if poll_timer >= POLL_PERIOD:
-      pipopa.p_state.follow_edge('poll')
-      poll_timer = 0
+    pipopa.p_state.follow_edge('poll')
 
     # Timid timing
-    poll_timer += BLINK_PERIOD
-    time.sleep(BLINK_PERIOD)
+    time.sleep(POLL_PERIOD)
 finally:
   GPIO.cleanup()
