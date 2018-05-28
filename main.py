@@ -13,8 +13,8 @@ GPIO.setup(GREEN_PIN, GPIO.OUT)
 GPIO.setup(YELLOW_PIN, GPIO.OUT)
 
 # Impeccable initializations
-#pipopa = PiPoPa('garrett', 'garrett', 'jesse')
-pipopa = PiPoPa('jesse', 'jesse', 'garrett')
+pipopa = PiPoPa('garrett', 'garrett', 'jesse')
+#pipopa = PiPoPa('jesse', 'jesse', 'garrett')
 leds = LEDs(pipopa.get_led_state)
 
 # Eventful events

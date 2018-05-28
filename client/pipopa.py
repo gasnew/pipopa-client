@@ -1,6 +1,7 @@
 from utils import *
 from pstate import PState
 from record_thread import RecordThread
+from on_hold import OnHold
 
 class PiPoPa:
   def __init__(self, name, password, recipient):
@@ -31,19 +32,15 @@ class PiPoPa:
       'yellow': False,
     }
 
-    mixer.init()
-    self.hold_counter = 0
+    self.on_hold = OnHold()
 
   def do_thing(self, channel):
-    stop_hold()
+    self.on_hold.pause()
     action = 'up' if GPIO.input(channel) else 'down'
     self.p_state.follow_edge(action)
 
   def standby(self):
-    #self.hold_counter += 1
-    if self.hold_counter > 0:
-      play_hold()
-
+    self.on_hold.play()
     if len(self.current_mids()) > 0:
       self.p_state.follow_edge('waitingMessage')
 
@@ -83,6 +80,7 @@ class PiPoPa:
       self.p_state.follow_edge('error')
 
   def await_playback(self):
+    self.on_hold.pause()
     mid = self.current_mids()[0]
     print(' [AWAIT_PLAYBACK] Awaiting playback for message {}...'.format(mid))
     pass
