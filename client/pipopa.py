@@ -1,4 +1,3 @@
-from os import walk
 from utils import *
 from pstate import PState
 
@@ -31,11 +30,20 @@ class PiPoPa:
       'yellow': False,
     }
 
+    mixer.init()
+    self.hold_counter = 0
+
   def do_thing(self, channel):
+    stop_hold()
     action = 'up' if GPIO.input(channel) else 'down'
     self.p_state.follow_edge(action)
 
   def standby(self):
+    print(self.hold_counter)
+    self.hold_counter += 1
+    if self.hold_counter > 0:
+      play_hold()
+
     if len(self.current_mids()) > 0:
       self.p_state.follow_edge('waitingMessage')
 
@@ -104,13 +112,9 @@ class PiPoPa:
       self.p_state.follow_edge('done')
 
   def current_mids(self):
-    mids = [int(n.split('.')[0]) for n in self.filenames()]
+    mids = [int(n.split('.')[0]) for n in filenames('messages')]
     mids.sort()
     return mids
-
-  def filenames(self):
-    (_, _, filenames) = walk('messages').next()
-    return filenames
 
   def get_led_state(self):
     self.led_state['state'] = self.p_state.state

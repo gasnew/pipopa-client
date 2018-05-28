@@ -5,9 +5,12 @@ import wave
 import sys
 import requests
 import os
+import random
+from os import walk
 from sys import byteorder
 from array import array
 from struct import pack
+from pygame import mixer
 
 def normalize(snd_data):
   "Average the volume out"
@@ -163,3 +166,21 @@ def mark_read(url, credentials, mid):
 
   # Mark message as read
   r = s.get('{}/messages/mark-read/{}'.format(url, mid))
+
+def play_hold():
+  try:
+    if not mixer.music.get_busy():
+      filename = random.choice(filenames('hold'))
+      path = '{}/../hold/{}'.format(os.path.dirname(os.path.abspath(__file__)), filename)
+      mixer.music.load(path)
+      mixer.music.play()
+  except Exception as e:
+    print(e)
+
+def stop_hold():
+  print('okay...')
+  mixer.music.stop()
+
+def filenames(folder):
+  (_, _, filenames) = walk(folder).next()
+  return filenames
