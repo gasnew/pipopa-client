@@ -23,12 +23,11 @@ def normalize(snd_data):
 
   return r
 
-def record():
+def record(check_abort):
   CHUNK = 512
   FORMAT = pyaudio.paInt16
   CHANNELS = 1
   RATE = 44100
-  RECORD_SECONDS = 5
   WAVE_OUTPUT_FILENAME = "output.wav"
 
   if sys.platform == 'darwin':
@@ -46,7 +45,7 @@ def record():
 
   try:
     data_all = array('h')
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+    while not check_abort():
       # little endian, signed short
       data_chunk = array('h', stream.read(CHUNK))
       if byteorder == 'big':

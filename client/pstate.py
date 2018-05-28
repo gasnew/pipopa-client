@@ -6,8 +6,7 @@ class PState:
       'poll': 'Polling',
     },
     'Recording': {
-      #'up': 'Uploading',
-      'done': 'Uploading',
+      'up': 'Uploading',
     },
     'Uploading': {
       'done': 'Standby',

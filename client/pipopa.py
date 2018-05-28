@@ -1,5 +1,6 @@
 from utils import *
 from pstate import PState
+from record_thread import RecordThread
 
 class PiPoPa:
   def __init__(self, name, password, recipient):
@@ -39,8 +40,7 @@ class PiPoPa:
     self.p_state.follow_edge(action)
 
   def standby(self):
-    print(self.hold_counter)
-    self.hold_counter += 1
+    #self.hold_counter += 1
     if self.hold_counter > 0:
       play_hold()
 
@@ -50,14 +50,16 @@ class PiPoPa:
   def record(self):
     try:
       print(' [RECORD] Recording now...')
-      record()
-      print(' [RECORD] Finished recording!')
-      self.p_state.follow_edge('done')
+      self.recordThread = RecordThread(lambda: self.p_state.state == 'Uploading')
+      self.recordThread.start()
     except Exception:
       print(' [ERROR] Record failed with error {}'.format(e))
       self.p_state.follow_edge('error')
 
   def upload(self):
+    print(' [UPLOAD] Finishing recording...')
+    self.recordThread.join()
+
     print(' [UPLOAD] Uploading now...')
     try:
       upload(self.url, self.credentials, self.recipient)
