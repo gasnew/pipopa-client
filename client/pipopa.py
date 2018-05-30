@@ -1,9 +1,12 @@
 from utils import *
 from pstate import PState
 from record_thread import RecordThread
+from poll_thread import PollThread
 from on_hold import OnHold
 
 class PiPoPa:
+  POLL_PERIOD = 4
+
   def __init__(self, name, password, recipient):
     self.name = name
     self.password = password
@@ -22,7 +25,7 @@ class PiPoPa:
     self.p_state.set_state_callback('Downloading', self.download)
     self.p_state.set_state_callback('AwaitingPlayback', self.await_playback)
     self.p_state.set_state_callback('Playing', self.playback)
-    self.p_state.set_state_callback('Polling', self.poll)
+    self.p_state.set_state_callback('Polling', self.start_poll_thread)
 
     self.led_state = {
       'state': self.p_state.state,
@@ -32,10 +35,22 @@ class PiPoPa:
       'yellow': False,
     }
 
+    self.poll_thread = None
+
     self.on_hold = OnHold()
 
+  def start(self):
+    while True:
+      self.p_state.follow_edge('poll')
+
+      time.sleep(self.POLL_PERIOD)
+
   def do_thing(self, channel):
+    if self.poll_thread.is_alive():
+      print(' [POLL] Joining poll thread...')
+      self.poll_thread.join()
     self.on_hold.pause()
+
     action = 'up' if GPIO.input(channel) else 'down'
     self.p_state.follow_edge(action)
 
@@ -97,6 +112,11 @@ class PiPoPa:
       self.p_state.follow_edge('more')
     else:
       self.p_state.follow_edge('done')
+
+  def start_poll_thread(self):
+    self.poll_thread = PollThread(lambda: self.poll())
+    self.poll_thread.start()
+    print(' [POLL] Starting poll thread!')
 
   def poll(self):
     print(' [POLL] Polling for new messages...')

@@ -27,12 +27,7 @@ try:
   # Luscious LEDs
   leds.start()
 
-  POLL_PERIOD = 3
-  while True:
-    # Putrid polling
-    pipopa.p_state.follow_edge('poll')
-
-    # Timid timing
-    time.sleep(POLL_PERIOD)
+  # Preposterous PiPoPa
+  pipopa.start()
 finally:
   GPIO.cleanup()
