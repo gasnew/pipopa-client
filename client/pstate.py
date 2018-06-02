@@ -16,6 +16,7 @@ class PState:
     },
     'AwaitingPlayback': {
       'down': 'Playing',
+      'poll': 'Polling',
     },
     'Playing': {
       'done': 'Standby',
