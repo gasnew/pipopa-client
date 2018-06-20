@@ -114,13 +114,14 @@ class PiPoPa:
       self.p_state.follow_edge('done')
 
   def start_poll_thread(self):
-    self.poll_thread = PollThread(lambda: self.poll())
+    timeout = self.POLL_PERIOD - 1
+    self.poll_thread = PollThread(lambda: self.poll(timeout))
     self.poll_thread.start()
     print(' [POLL] Starting poll thread!')
 
-  def poll(self):
+  def poll(self, timeout):
     print(' [POLL] Polling for new messages...')
-    new_mids = poll(self.url, self.credentials)
+    new_mids = poll(self.url, self.credentials, timeout)
     self.new_mids = [mid for mid in new_mids if mid not in self.current_mids()]
 
     if len(self.new_mids) > 0:

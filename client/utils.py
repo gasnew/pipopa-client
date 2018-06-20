@@ -106,8 +106,8 @@ def delete(mid):
   filename = '{}/{}.wav'.format(path, mid)
   os.unlink(filename)
 
-def login(s, url, credentials):
-  r = s.post('{}/login'.format(url), credentials)
+def login(s, url, credentials, timeout=None):
+  r = s.post('{}/login'.format(url), credentials, timeout=timeout)
 
 def upload(url, credentials, recipient):
   s = requests.session()
@@ -145,15 +145,19 @@ def download(url, credentials, mids):
           if chunk: # filter out keep-alive new chunks
             f.write(chunk)
 
-def poll(url, credentials):
-  s = requests.session()
+def poll(url, credentials, timeout):
+  try:
+    s = requests.session()
 
-  # Log in
-  login(s, url, credentials)
+    # Log in
+    login(s, url, credentials, timeout)
 
-  # retrieve waiting messages
-  r2 = s.get('{}/messages/waiting'.format(url))
-  mids = [m['id'] for m in r2.json()['messages']]
+    # retrieve waiting messages
+    r2 = s.get('{}/messages/waiting'.format(url), timeout=timeout)
+    mids = [m['id'] for m in r2.json()['messages']]
+  except Exception as e:
+    print(' [ERROR] {}'.format(e))
+    mids = []
 
   return mids
 
