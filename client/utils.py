@@ -13,13 +13,24 @@ from struct import pack
 from pygame import mixer
 
 def normalize(snd_data):
-  "Average the volume out"
-  MAXIMUM = 16384
-  scale_factor = float(MAXIMUM)/max(abs(i) for i in snd_data)
+  # Attenuate spikes and amplify maximally
+  MAXIMUM = 2**15
+  THRESHOLD = MAXIMUM * 0.12
+
+  tempered = [i if abs(i) < THRESHOLD else THRESHOLD * abs(i) / i for i in snd_data]
+  maximum = max(abs(i) for i in tempered)
+  scale_factor = float(MAXIMUM)/maximum
 
   r = array('h')
-  for i in snd_data:
-    r.append(int(i*scale_factor))
+  for i in tempered:
+    val = i*scale_factor
+    if abs(i) >= THRESHOLD:
+      val = 0
+
+    try:
+      r.append(int(val))
+    except Exception as e:
+      r.append(0)
 
   return r
 
