@@ -148,13 +148,18 @@ def download(url, credentials, mids):
   for mid in mids:
     print('message {}'.format(mid))
 
-    filename = '{}/{}.wav'.format(path, mid)
-    r3 = s.get('{}/messages/download/{}'.format(url, mid), stream=True)
-    if r3.status_code == 200:
-      with open(filename, 'wb') as f:
-        for chunk in r3.iter_content(chunk_size=512): 
-          if chunk: # filter out keep-alive new chunks
-            f.write(chunk)
+    try:
+      filename = '{}/{}.wav'.format(path, mid)
+      r3 = s.get('{}/messages/download/{}'.format(url, mid), stream=True)
+      print(r3.headers)
+      if r3.status_code == 200:
+        with open(filename, 'wb') as f:
+          for chunk in r3.iter_content(chunk_size=512): 
+            if chunk: # filter out keep-alive new chunks
+              f.write(chunk)
+    except Exception as e:
+      print("OH NOOOOO\n\n\n")
+      print(e)
 
 def poll(url, credentials, timeout):
   try:

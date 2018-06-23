@@ -3,6 +3,7 @@ from pstate import PState
 from record_thread import RecordThread
 from poll_thread import PollThread
 from on_hold import OnHold
+import threading
 
 class PiPoPa:
   POLL_PERIOD = 4
@@ -41,8 +42,15 @@ class PiPoPa:
 
   def start(self):
     while True:
-      self.p_state.follow_edge('poll')
+      print(' [THREADING] Count: {}'.format(threading.active_count()))
+      print(threading.enumerate())
+      if self.poll_thread and self.poll_thread.is_alive():
+        print(' [POLL] Poll thread already alive...')
+      else:
+        print(threading.current_thread())
+        self.p_state.follow_edge('poll')
 
+      print(' [THREADING] Count: {}'.format(threading.active_count()))
       time.sleep(self.POLL_PERIOD)
 
   def do_thing(self, channel):
@@ -98,7 +106,6 @@ class PiPoPa:
     self.on_hold.pause()
     mid = self.current_mids()[0]
     print(' [AWAIT_PLAYBACK] Awaiting playback for message {}...'.format(mid))
-    pass
 
   def playback(self):
     mid = self.current_mids()[0]
@@ -130,7 +137,10 @@ class PiPoPa:
       self.p_state.follow_edge('newMessage')
     else:
       print(' [POLL] No new messages found')
-      self.p_state.follow_edge('done')
+      if len(self.current_mids()) > 0:
+        self.p_state.follow_edge('waitingMessage')
+      else:
+        self.p_state.follow_edge('done')
 
   def current_mids(self):
     mids = [int(n.split('.')[0]) for n in filenames('messages')]

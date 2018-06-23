@@ -25,6 +25,7 @@ class PState:
     'Polling': {
       'newMessage': 'Downloading',
       'done': 'Standby',
+      'waitingMessage': 'AwaitingPlayback',
     },
   }
 
@@ -36,6 +37,7 @@ class PState:
     self.state_callbacks[state] = callback
 
   def follow_edge(self, action):
+    print(' FOLLOW EDGE {}'.format(action))
     try:
       self.state = self.STATE_GRAPH[self.state][action]
       print(' [STATE] switching to state {}'.format(self.state))
