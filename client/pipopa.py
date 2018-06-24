@@ -40,6 +40,8 @@ class PiPoPa:
 
     self.on_hold = OnHold()
 
+    os.makedirs('messages')
+
   def start(self):
     while True:
       print(' [THREADING] Count: {}'.format(threading.active_count()))
