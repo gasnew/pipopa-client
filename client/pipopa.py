@@ -40,7 +40,8 @@ class PiPoPa:
 
     self.on_hold = OnHold()
 
-    os.makedirs('messages')
+    if not os.path.exists('messages'):
+      os.makedirs('messages')
 
   def start(self):
     while True:
