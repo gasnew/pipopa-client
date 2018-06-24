@@ -17,31 +17,21 @@ class OnHold():
 
   def play(self):
     try:
-      if self.paused:
-        mixer.music.unpause()
-        self.paused = False
-        print(' [HOLD] Resuming on-hold music!')
-      elif not mixer.music.get_busy():
-        if self.rad_countdown == 0:
-          name = 'rad/{}'.format(random.choice(filenames('hold/rad')))
-          self.rad_countdown = self.RAD_PERIOD
-        else:
-          if (self.play_count + 2) % self.INFO_PERIOD == 0:
-            name = 'info/arabesque.ogg'
-          elif (self.play_count + 2) % self.INFO_PERIOD == 1:
-            name = 'info/stego_urls.ogg'
-          else:
-            names = self.song_names
-            name = names[(names.index(self.current_song_name) + 1) % len(names)]
-            self.current_song_name = name
-            self.rad_countdown -= 1
-          self.play_count += 1
+      if self.rad_countdown == 0:
+        name = 'rad/{}'.format(random.choice(filenames('hold/rad')))
+        self.rad_countdown = self.RAD_PERIOD
+      else:
+        names = self.song_names
+        name = names[(names.index(self.current_song_name) + 1) % len(names)]
+        self.current_song_name = name
+        self.rad_countdown -= 1
+        self.play_count += 1
 
-        path = '{}/../hold/{}'.format(os.path.dirname(os.path.abspath(__file__)), name)
-        mixer.music.load(path)
-        mixer.music.play()
+      path = '{}/../hold/{}'.format(os.path.dirname(os.path.abspath(__file__)), name)
+      mixer.music.load(path)
+      mixer.music.play()
 
-        print(' [HOLD] Starting new song ({}): {}'.format(self.play_count, name))
+      print(' [HOLD] Starting new song ({}): {}'.format(self.play_count, name))
     except Exception as e:
       print('AHHHH')
       print(e)
