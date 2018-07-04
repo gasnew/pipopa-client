@@ -22,10 +22,12 @@ sudo apt-get install git
 2. Install pyaudio
 ```bash
 git clone http://people.csail.mit.edu/hubert/git/pyaudio.git
-python pyaudio/setup.py install --user
+cd pyaudio
+python setup.py install --user
 ```
 3. Download PiPoPa, and checkout your branch
 ```bash
+cd ~
 git clone http://github.com/gasnew/pipopa-client
 cd pipopa-client
 git checkout dad
