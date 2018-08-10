@@ -1,10 +1,14 @@
 import RPi.GPIO as GPIO
 import time
 from threading import Thread
+from psutil import virtual_memory
 
 RED_PIN = 18
 GREEN_PIN = 15
 YELLOW_PIN = 14
+BLUE_PIN = 24
+
+MEMORY_THRESHOLD = 60.0
 
 class LEDs(Thread):
   STATE_MAPS = {
@@ -70,3 +74,9 @@ class LEDs(Thread):
         state[channel_name] = False
 
       GPIO.output(channel, state[channel_name])
+
+    # BLUE GUY
+    if virtual_memory().percent > MEMORY_THRESHOLD:
+      GPIO.output(BLUE_PIN, True)
+    else:
+      GPIO.output(BLUE_PIN, False)

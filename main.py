@@ -11,6 +11,7 @@ GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(RED_PIN, GPIO.OUT)
 GPIO.setup(GREEN_PIN, GPIO.OUT)
 GPIO.setup(YELLOW_PIN, GPIO.OUT)
+GPIO.setup(BLUE_PIN, GPIO.OUT)
 
 # Impeccable initializations
 pipopa = PiPoPa('garrett', 'garrett', 'jesse')
