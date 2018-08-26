@@ -16,6 +16,7 @@ Check out the [BOM](https://docs.google.com/spreadsheets/d/1JkMSPfeMcv-XkWP2sKz1
 sudo apt-get install python-pygame
 sudo apt-get install python-requests
 sudo apt-get install python-dev
+sudo apt-get install python-psutil
 sudo apt-get install libportaudio0 libportaudio2 libportaudiocpp0 portaudio19-dev
 sudo apt-get install git
 ```
