@@ -23,7 +23,7 @@ leds = LEDs(pipopa.get_led_state)
 GPIO.add_event_detect(BUTTON_PIN,
   GPIO.BOTH,
   callback=pipopa.do_thing,
-  bouncetime=20)
+  bouncetime=300)
 
 try:
   # Luscious LEDs
